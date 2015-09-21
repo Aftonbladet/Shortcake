@@ -148,3 +148,14 @@
 		<# } #>
 	</div>
 </script>
+
+<script type="text/html" id="tmpl-shortcode-ui-field-acf">
+	<div class="field-block">
+		View: {{{ data.labelbro }} <br/>
+		Model: {{{ data.hello }}}<br/>
+		ID: {{{ data.id }}}<br/>
+		Attr: {{{ data.attr }}}<br/>
+		Label: {{{ data.label }}}<br/>
+		Value: {{{ data.value }}}<br/>
+	</div>
+</script>

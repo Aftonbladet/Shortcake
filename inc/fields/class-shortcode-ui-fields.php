@@ -59,6 +59,10 @@ class Shortcode_UI_Fields {
 		'range' => array(
 			'template' => 'shortcode-ui-field-range',
 		),
+		'acf' => array(
+			'template' => 'shortcode-ui-field-acf',
+			'data' => '<b>hello</b>'
+		),
 	);
 
 	/**

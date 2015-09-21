@@ -56,9 +56,20 @@ var EditShortcodeForm = wp.Backbone.View.extend({
 			view.template  = wp.media.template( tmplName );
 			view.shortcode = t.model;
 
-			t.views.add( '.edit-shortcode-form-fields', view );
+			t.views.add( '.edit-shortcode-form-fields', view ); 
 
+			//console.log(view.shortcode );
 		} );
+
+		//Set to model
+		/*
+		this.model.set({
+			hello: '<strong>wat</strong>'
+		});
+
+		//Add some stuff
+		_.extend(this, {labelbro : "wat"});
+		*/
 
 		if ( 0 === this.model.get( 'attrs' ).length && ( ! innerContent || typeof innerContent == 'undefined' ) ) {
 			var messageView = new Backbone.View({
