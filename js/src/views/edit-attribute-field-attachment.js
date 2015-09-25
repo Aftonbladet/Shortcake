@@ -18,6 +18,10 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 	 */
 	updateValue: function( id ) {
 
+
+		//Too late
+		//console.log(id);
+
 		if ( ! id ) {
 			return;
 		}
@@ -26,6 +30,7 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 
 		var self = this;
 
+		/*
 		if ( editAttributeFieldAttachment.getFromCache( id ) ) {
 			self._renderPreview( editAttributeFieldAttachment.getFromCache( id ) );
 
@@ -34,6 +39,7 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 			self.triggerCallbacks();
 			return;
 		}
+		*/
 
 		this.$container.addClass( 'loading' );
 
@@ -68,7 +74,7 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 		var $addButton    = this.$container.find( 'button.add' );
 
 		this.frame = wp.media( {
-			multiple: false,
+			multiple: true,
 			title: this.model.get( 'frameTitle' ),
 			library: {
 				type: this.model.get( 'libraryType' ),
@@ -157,6 +163,11 @@ var editAttributeFieldAttachment = sui.views.editAttributeField.extend( {
 	 */
 	_selectAttachment: function(e) {
 		var selection  = this.frame.state().get('selection');
+
+		selection.map( function( attachment ) {
+			console.log(selection);
+		});
+
 			attachment = selection.first();
 		if ( attachment.id != this.model.get( 'value' ) ){
 			this.model.set( 'value', null );

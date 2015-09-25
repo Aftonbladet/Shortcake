@@ -27,7 +27,7 @@ module.exports = function( grunt ) {
 				tasks: ['styles'],
 				options: {
 					debounceDelay: 500,
-					livereload: true,
+					livereload: false,
 					sourceMap: true
 				}
 			},
@@ -37,7 +37,7 @@ module.exports = function( grunt ) {
 				tasks: ['scripts'],
 				options: {
 					debounceDelay: 500,
-					livereload: true,
+					livereload: false,
 					sourceMap: true
 				}
 			}
