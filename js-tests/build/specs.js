@@ -58,7 +58,7 @@ var Shortcode = require('../../js/src/models/shortcode');
 var InnerContent = require('../../js/src/models/inner-content');
 var ShortcodeAttribute = require('../../js/src/models/shortcode-attribute');
 var ShortcodeAttributes = require('../../js/src/collections/shortcode-attributes');
-var $ = (typeof window !== "undefined" ? window.jQuery : typeof global !== "undefined" ? global.jQuery : null);
+var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
 describe( "Shortcode Model", function() {
 
@@ -135,7 +135,7 @@ describe( "Shortcode Model", function() {
 var Shortcode = require('../../js/src/models/shortcode');
 var ShortcodeViewConstructor = require('../../js/src/utils/shortcode-view-constructor');
 var sui = require('../../js/src/utils/sui');
-var $ = (typeof window !== "undefined" ? window.jQuery : typeof global !== "undefined" ? global.jQuery : null);
+var $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
 describe( 'Shortcode View Constructor', function(){
 
@@ -167,8 +167,8 @@ describe( 'Shortcode View Constructor', function(){
 var Shortcode = require('./../../../js/src/models/shortcode.js');
 var MceViewConstructor = require('./../../../js/src/utils/shortcode-view-constructor.js');
 var sui = require('./../../../js/src/utils/sui.js');
-var jQuery = (typeof window !== "undefined" ? window.jQuery : typeof global !== "undefined" ? global.jQuery : null);
-var wp = (typeof window !== "undefined" ? window.wp : typeof global !== "undefined" ? global.wp : null);
+var jQuery = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
+var wp = (typeof window !== "undefined" ? window['wp'] : typeof global !== "undefined" ? global['wp'] : null);
 
 describe( "MCE View Constructor", function() {
 
@@ -340,7 +340,7 @@ describe( "SUI Util", function() {
 
 },{"./../../../js/src/collections/shortcodes.js":8,"./../../../js/src/utils/sui.js":13}],7:[function(require,module,exports){
 (function (global){
-var Backbone = (typeof window !== "undefined" ? window.Backbone : typeof global !== "undefined" ? global.Backbone : null);
+var Backbone = (typeof window !== "undefined" ? window['Backbone'] : typeof global !== "undefined" ? global['Backbone'] : null);
 var ShortcodeAttribute = require('./../models/shortcode-attribute.js');
 
 /**
@@ -362,7 +362,7 @@ module.exports = ShortcodeAttributes;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./../models/shortcode-attribute.js":10}],8:[function(require,module,exports){
 (function (global){
-var Backbone = (typeof window !== "undefined" ? window.Backbone : typeof global !== "undefined" ? global.Backbone : null);
+var Backbone = (typeof window !== "undefined" ? window['Backbone'] : typeof global !== "undefined" ? global['Backbone'] : null);
 var Shortcode = require('./../models/shortcode.js');
 
 // Shortcode Collection
@@ -375,7 +375,7 @@ module.exports = Shortcodes;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./../models/shortcode.js":11}],9:[function(require,module,exports){
 (function (global){
-var Backbone = (typeof window !== "undefined" ? window.Backbone : typeof global !== "undefined" ? global.Backbone : null);
+var Backbone = (typeof window !== "undefined" ? window['Backbone'] : typeof global !== "undefined" ? global['Backbone'] : null);
 
 /**
  * Shortcode Attribute Model.
@@ -394,7 +394,7 @@ module.exports = InnerContent;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],10:[function(require,module,exports){
 (function (global){
-var Backbone = (typeof window !== "undefined" ? window.Backbone : typeof global !== "undefined" ? global.Backbone : null);
+var Backbone = (typeof window !== "undefined" ? window['Backbone'] : typeof global !== "undefined" ? global['Backbone'] : null);
 
 var ShortcodeAttribute = Backbone.Model.extend({
 	defaults: {
@@ -414,7 +414,7 @@ module.exports = ShortcodeAttribute;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],11:[function(require,module,exports){
 (function (global){
-var Backbone = (typeof window !== "undefined" ? window.Backbone : typeof global !== "undefined" ? global.Backbone : null);
+var Backbone = (typeof window !== "undefined" ? window['Backbone'] : typeof global !== "undefined" ? global['Backbone'] : null);
 var ShortcodeAttributes = require('./../collections/shortcode-attributes.js');
 var InnerContent = require('./inner-content.js');
 
@@ -522,8 +522,8 @@ module.exports = Shortcode;
 },{"./../collections/shortcode-attributes.js":7,"./inner-content.js":9}],12:[function(require,module,exports){
 (function (global){
 var sui = require('./sui.js'),
-    wp = (typeof window !== "undefined" ? window.wp : typeof global !== "undefined" ? global.wp : null),
-    $ = (typeof window !== "undefined" ? window.jQuery : typeof global !== "undefined" ? global.jQuery : null);
+    wp = (typeof window !== "undefined" ? window['wp'] : typeof global !== "undefined" ? global['wp'] : null),
+    $ = (typeof window !== "undefined" ? window['jQuery'] : typeof global !== "undefined" ? global['jQuery'] : null);
 
 /**
  * Generic shortcode mce view constructor.
@@ -655,7 +655,7 @@ var shortcodeViewConstructor = {
 
 		var model, attr;
 
-		var megaRegex = /\[([^\s\]]+)([^\]]+)?\]([^\[]*)?(\[\/(\S+?)\])?/;
+		var megaRegex = this.getRegex();
 		var matches = shortcodeString.match( megaRegex );
 
 		if ( ! matches ) {
@@ -663,7 +663,7 @@ var shortcodeViewConstructor = {
 		}
 
 		defaultShortcode = sui.shortcodes.findWhere({
-			shortcode_tag : matches[1]
+			shortcode_tag : matches[2]
 		});
 
 		if ( ! defaultShortcode ) {
@@ -672,10 +672,10 @@ var shortcodeViewConstructor = {
 
 		currentShortcode = defaultShortcode.clone();
 
-		if ( matches[2] ) {
+		if ( matches[3] ) {
 
 			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/gmi;
-			attributeMatches   = matches[2].match( attributeRegex ) || [];
+			attributeMatches   = matches[3].match( attributeRegex ) || [];
 
 			// Trim whitespace from matches.
 			attributeMatches = attributeMatches.map( function( match ) {
@@ -705,12 +705,12 @@ var shortcodeViewConstructor = {
 
 		}
 
-		if ( matches[3] ) {
+		if ( matches[5] ) {
 			var inner_content = currentShortcode.get( 'inner_content' );
 			if ( inner_content ) {
-				inner_content.set( 'value', this.unAutoP( matches[3] ) );
+				inner_content.set( 'value', this.unAutoP( matches[5] ) );
 			} else {
-				currentShortcode.set( 'inner_content_backup', this.unAutoP( matches[3] ) );
+				currentShortcode.set( 'inner_content_backup', this.unAutoP( matches[5] ) );
 			}
 		}
 
@@ -842,6 +842,72 @@ var shortcodeViewConstructor = {
 			return styles;
 		},
 
+	},
+
+	/**
+	 * JS implementation of WordPress' get_shortcode_regex() function
+	 *
+	 * The regex is almost identical, with the exception of
+	 * the *+ parts, since they were erroring out with "nothing to repeat"
+	 * This should probably be kept in sync with get_shortcode_regex() to
+	 * preserve compatibility.
+	 */
+	getRegex: function() {
+		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
+
+		var megaRegex = '';
+
+		megaRegex += '\\[';                              // Opening bracket
+		megaRegex += '(\\[?)';                           // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
+		megaRegex += '(' + shortcode_tags + ')';         // 2: Shortcode name
+		megaRegex += '(?![\\w-])';                       // Not followed by word character or hyphen
+		megaRegex += '(';                                // 3: Unroll the loop: Inside the opening shortcode tag
+		megaRegex +=     '[^\\]\\/]*';                   // Not a closing bracket or forward slash
+		megaRegex +=     '(?:';
+		megaRegex +=         '\\/(?!\\])';               // A forward slash not followed by a closing bracket
+		megaRegex +=         '[^\\]\\/]*';               // Not a closing bracket or forward slash
+		megaRegex +=     ')*?';
+		megaRegex += ')';
+		megaRegex += '(?:';
+		megaRegex +=     '(\\/)';                        // 4: Self closing tag ...
+		megaRegex +=     '\\]';                          // ... and closing bracket
+		megaRegex += '|';
+		megaRegex +=     '\\]';                          // Closing bracket
+		megaRegex +=     '(?:';
+		megaRegex +=         '(';                        // 5: Unroll the loop: Optionally, anything between the opening and closing shortcode tags
+		megaRegex +=             '[^\\[]*';              // Not an opening bracket
+		megaRegex +=             '(?:';
+		megaRegex +=                 '\\[(?!\\/\\2\\])'; // An opening bracket not followed by the closing shortcode tag
+		megaRegex +=                 '[^\\[]*';          // Not an opening bracket
+		megaRegex +=             ')*';
+		megaRegex +=         ')';
+		megaRegex +=         '\\[\\/\\2\\]';             // Closing shortcode tag
+		megaRegex +=     ')?';
+		megaRegex += ')';
+		megaRegex += '(\\]?)';                           // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
+
+		return new RegExp( megaRegex );
+	},
+
+	/**
+	 * JS version of PHP's preg_quote()
+	 */
+	pregQuote: function( str, delimiter ) {
+		//  discuss at: http://phpjs.org/functions/preg_quote/
+		// original by: booeyOH
+		// improved by: Ates Goral (http://magnetiq.com)
+		// improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// improved by: Brett Zamir (http://brett-zamir.me)
+		// bugfixed by: Onno Marsman
+		//   example 1: preg_quote("$40");
+		//   returns 1: '\\$40'
+		//   example 2: preg_quote("*RRRING* Hello?");
+		//   returns 2: '\\*RRRING\\* Hello\\?'
+		//   example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
+		//   returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'
+
+		return String(str)
+		.replace( new RegExp( '[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + ( delimiter || '' ) + '-]', 'g' ), '\\$&' );
 	},
 
 };
