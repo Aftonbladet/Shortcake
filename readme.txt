@@ -1,4 +1,4 @@
-=== Shortcake (Shortcode UI) ===
+=== Shortcake (Shortcode UI) - Aftonbladet flavored ===
 Contributors: fusionengineering, mattheu, danielbachhuber, zebulonj, goldenapples, jitendraharpalani, sanchothefat, bfintal, davisshaver
 Tags: shortcodes
 Requires at least: 4.1
@@ -8,6 +8,8 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Shortcake makes using WordPress shortcodes a piece of cake.
+
+This fork attempts to fix some bugs and make Shortcake more usable. It is not 100% guaranteed to be compatible with the original Shortcake.
 
 == Description ==
 
