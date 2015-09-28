@@ -204,12 +204,15 @@ Shortcode = Backbone.Model.extend({
 			}
 
 			var attrValue = attr.get( 'value' );
-			/*
-			//attrValue = attrValue.replace('[', '&#91;');
-			//attrValue = attrValue.replace(']', '&#93;');
-			attrValue = attrValue.replace(/"/g, '&#34;');
+
+			//Replace attributes that we can't keep.
+			attrValue = attrValue.replace(/\[/g, '_');
+			attrValue = attrValue.replace(/\]/g, '_');
+			attrValue = attrValue.replace(/'/g, '');
+
+			//attrValue = attrValue.replace(/"/g, '&#34;');
 			console.log(attrValue);
-			*/
+
 
 			//Single quote is less common: https://core.trac.wordpress.org/ticket/15434
 			attrs.push( attr.get( 'attr' ) + '=\'' + attrValue + '\'' );
