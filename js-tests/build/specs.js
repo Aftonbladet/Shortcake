@@ -114,11 +114,11 @@ describe( "Shortcode Model", function() {
 		var _shortcode = jQuery.extend( true, {}, shortcode );
 
 		// Test with attribute and with content.
-		expect( _shortcode.formatShortcode() ).toEqual( '[test_shortcode attr="test value"]test content[/test_shortcode]' );
+		expect( _shortcode.formatShortcode() ).toEqual( '[test_shortcode attr=\'test value\']test content[/test_shortcode]' );
 
 		// Test without content.
 		_shortcode.get('inner_content').unset( 'value' );
-		expect( _shortcode.formatShortcode() ).toEqual( '[test_shortcode attr="test value"]' );
+		expect( _shortcode.formatShortcode() ).toEqual( '[test_shortcode attr=\'test value\']' );
 
 		// Test without attributes
 		_shortcode.get( 'attrs' ).first().unset( 'value' );
@@ -154,9 +154,9 @@ describe( 'Shortcode View Constructor', function(){
 			]
 		};
 		sui.shortcodes.add( data );
-		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_inner_content foo="bar"]burrito[/no_inner_content]' );
+		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_inner_content foo=\'bar\']burrito[/no_inner_content]' );
 		var _shortcode = $.extend( true, {}, shortcode );
-		expect( _shortcode.formatShortcode() ).toEqual( '[no_inner_content foo="bar"]burrito[/no_inner_content]' );
+		expect( _shortcode.formatShortcode() ).toEqual( '[no_inner_content foo=\'bar\']burrito[/no_inner_content]' );
 	});
 
 });
@@ -487,15 +487,40 @@ Shortcode = Backbone.Model.extend({
 				return;
 			}
 
-			attrs.push( attr.get( 'attr' ) + '="' + attr.get( 'value' ) + '"' );
+			var attrValue = attr.get( 'value' );
+			/*
+			//attrValue = attrValue.replace('[', '&#91;');
+			//attrValue = attrValue.replace(']', '&#93;');
+			attrValue = attrValue.replace(/"/g, '&#34;');
+			console.log(attrValue);
+			*/
 
-		} );
+			//Single quote is less common: https://core.trac.wordpress.org/ticket/15434
+			attrs.push( attr.get( 'attr' ) + '=\'' + attrValue + '\'' );
+		});
 
 		if ( this.get( 'inner_content' ) ) {
 			content = this.get( 'inner_content' ).get( 'value' );
 		} else if ( this.get( 'inner_content_backup' ) ) {
 			content = this.get( 'inner_content_backup' );
 		}
+
+		//Replace shortcodes in inner_content with escaped versions of themselves.
+		/*
+		if(content) {
+			content = content.replace(/\[(.*?)\]/g, '[[$1]]');
+		}
+		*/
+
+		//http://wordpress.stackexchange.com/questions/33960/how-do-i-escape-a-in-a-short-code
+		/*
+		if(content) {
+			content = content.replace('[', '&#91;');
+			content = content.replace(']', '&#93;');
+			console.log("replacing");
+		  console.log(content);
+		}
+		*/
 
 		if ( attrs.length > 0 ) {
 			template = "[{{ shortcode }} {{ attributes }}]";
@@ -655,8 +680,11 @@ var shortcodeViewConstructor = {
 
 		var model, attr;
 
-		var megaRegex = this.getRegex();
-		var matches = shortcodeString.match( megaRegex );
+		//Prepare tags
+		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
+		var re = this.getRegex(shortcode_tags), matches;
+
+		matches = re.exec( shortcodeString );
 
 		if ( ! matches ) {
 			return;
@@ -672,9 +700,11 @@ var shortcodeViewConstructor = {
 
 		currentShortcode = defaultShortcode.clone();
 
+		//If we have attributes
 		if ( matches[3] ) {
 
-			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/gmi;
+			//Do attribute matching. From WP 4.3
+			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/g; //mi
 			attributeMatches   = matches[3].match( attributeRegex ) || [];
 
 			// Trim whitespace from matches.
@@ -715,7 +745,6 @@ var shortcodeViewConstructor = {
 		}
 
 		return currentShortcode;
-
 	},
 
  	/**
@@ -732,6 +761,7 @@ var shortcodeViewConstructor = {
 	},
 
 	// Backwards compatability for Pre WP 4.2.
+	/* ------------------ START OF WP 4.1 ------------------ */
 	View: {
 
 		overlay: true,
@@ -843,50 +873,15 @@ var shortcodeViewConstructor = {
 		},
 
 	},
+	/* ------------------ END OF WP 4.1 ------------------ */
 
 	/**
-	 * JS implementation of WordPress' get_shortcode_regex() function
-	 *
-	 * The regex is almost identical, with the exception of
-	 * the *+ parts, since they were erroring out with "nothing to repeat"
-	 * This should probably be kept in sync with get_shortcode_regex() to
-	 * preserve compatibility.
+	 * JS implementation of get_shortcode_regex(), from shortcode.js
 	 */
-	getRegex: function() {
-		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
+	getRegex: function( shortcode_tags ) {
 
-		var megaRegex = '';
-
-		megaRegex += '\\[';                              // Opening bracket
-		megaRegex += '(\\[?)';                           // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
-		megaRegex += '(' + shortcode_tags + ')';         // 2: Shortcode name
-		megaRegex += '(?![\\w-])';                       // Not followed by word character or hyphen
-		megaRegex += '(';                                // 3: Unroll the loop: Inside the opening shortcode tag
-		megaRegex +=     '[^\\]\\/]*';                   // Not a closing bracket or forward slash
-		megaRegex +=     '(?:';
-		megaRegex +=         '\\/(?!\\])';               // A forward slash not followed by a closing bracket
-		megaRegex +=         '[^\\]\\/]*';               // Not a closing bracket or forward slash
-		megaRegex +=     ')*?';
-		megaRegex += ')';
-		megaRegex += '(?:';
-		megaRegex +=     '(\\/)';                        // 4: Self closing tag ...
-		megaRegex +=     '\\]';                          // ... and closing bracket
-		megaRegex += '|';
-		megaRegex +=     '\\]';                          // Closing bracket
-		megaRegex +=     '(?:';
-		megaRegex +=         '(';                        // 5: Unroll the loop: Optionally, anything between the opening and closing shortcode tags
-		megaRegex +=             '[^\\[]*';              // Not an opening bracket
-		megaRegex +=             '(?:';
-		megaRegex +=                 '\\[(?!\\/\\2\\])'; // An opening bracket not followed by the closing shortcode tag
-		megaRegex +=                 '[^\\[]*';          // Not an opening bracket
-		megaRegex +=             ')*';
-		megaRegex +=         ')';
-		megaRegex +=         '\\[\\/\\2\\]';             // Closing shortcode tag
-		megaRegex +=     ')?';
-		megaRegex += ')';
-		megaRegex += '(\\]?)';                           // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
-
-		return new RegExp( megaRegex );
+		//From WP 4.3
+		return new RegExp( '\\[(\\[?)(' + shortcode_tags + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
 	},
 
 	/**

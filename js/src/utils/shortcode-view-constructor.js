@@ -132,8 +132,11 @@ var shortcodeViewConstructor = {
 
 		var model, attr;
 
-		var megaRegex = this.getRegex();
-		var matches = shortcodeString.match( megaRegex );
+		//Prepare tags
+		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
+		var re = this.getRegex(shortcode_tags), matches;
+
+		matches = re.exec( shortcodeString );
 
 		if ( ! matches ) {
 			return;
@@ -149,9 +152,11 @@ var shortcodeViewConstructor = {
 
 		currentShortcode = defaultShortcode.clone();
 
+		//If we have attributes
 		if ( matches[3] ) {
 
-			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/gmi;
+			//Do attribute matching. From WP 4.3
+			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/g; //mi
 			attributeMatches   = matches[3].match( attributeRegex ) || [];
 
 			// Trim whitespace from matches.
@@ -192,7 +197,6 @@ var shortcodeViewConstructor = {
 		}
 
 		return currentShortcode;
-
 	},
 
  	/**
@@ -209,6 +213,7 @@ var shortcodeViewConstructor = {
 	},
 
 	// Backwards compatability for Pre WP 4.2.
+	/* ------------------ START OF WP 4.1 ------------------ */
 	View: {
 
 		overlay: true,
@@ -320,50 +325,15 @@ var shortcodeViewConstructor = {
 		},
 
 	},
+	/* ------------------ END OF WP 4.1 ------------------ */
 
 	/**
-	 * JS implementation of WordPress' get_shortcode_regex() function
-	 *
-	 * The regex is almost identical, with the exception of
-	 * the *+ parts, since they were erroring out with "nothing to repeat"
-	 * This should probably be kept in sync with get_shortcode_regex() to
-	 * preserve compatibility.
+	 * JS implementation of get_shortcode_regex(), from shortcode.js
 	 */
-	getRegex: function() {
-		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
+	getRegex: function( shortcode_tags ) {
 
-		var megaRegex = '';
-
-		megaRegex += '\\[';                              // Opening bracket
-		megaRegex += '(\\[?)';                           // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
-		megaRegex += '(' + shortcode_tags + ')';         // 2: Shortcode name
-		megaRegex += '(?![\\w-])';                       // Not followed by word character or hyphen
-		megaRegex += '(';                                // 3: Unroll the loop: Inside the opening shortcode tag
-		megaRegex +=     '[^\\]\\/]*';                   // Not a closing bracket or forward slash
-		megaRegex +=     '(?:';
-		megaRegex +=         '\\/(?!\\])';               // A forward slash not followed by a closing bracket
-		megaRegex +=         '[^\\]\\/]*';               // Not a closing bracket or forward slash
-		megaRegex +=     ')*?';
-		megaRegex += ')';
-		megaRegex += '(?:';
-		megaRegex +=     '(\\/)';                        // 4: Self closing tag ...
-		megaRegex +=     '\\]';                          // ... and closing bracket
-		megaRegex += '|';
-		megaRegex +=     '\\]';                          // Closing bracket
-		megaRegex +=     '(?:';
-		megaRegex +=         '(';                        // 5: Unroll the loop: Optionally, anything between the opening and closing shortcode tags
-		megaRegex +=             '[^\\[]*';              // Not an opening bracket
-		megaRegex +=             '(?:';
-		megaRegex +=                 '\\[(?!\\/\\2\\])'; // An opening bracket not followed by the closing shortcode tag
-		megaRegex +=                 '[^\\[]*';          // Not an opening bracket
-		megaRegex +=             ')*';
-		megaRegex +=         ')';
-		megaRegex +=         '\\[\\/\\2\\]';             // Closing shortcode tag
-		megaRegex +=     ')?';
-		megaRegex += ')';
-		megaRegex += '(\\]?)';                           // 6: Optional second closing brocket for escaping shortcodes: [[tag]]
-
-		return new RegExp( megaRegex );
+		//From WP 4.3
+		return new RegExp( '\\[(\\[?)(' + shortcode_tags + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
 	},
 
 	/**

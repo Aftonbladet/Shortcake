@@ -20,9 +20,9 @@ describe( 'Shortcode View Constructor', function(){
 			]
 		};
 		sui.shortcodes.add( data );
-		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_inner_content foo="bar"]burrito[/no_inner_content]' );
+		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_inner_content foo=\'bar\']burrito[/no_inner_content]' );
 		var _shortcode = $.extend( true, {}, shortcode );
-		expect( _shortcode.formatShortcode() ).toEqual( '[no_inner_content foo="bar"]burrito[/no_inner_content]' );
+		expect( _shortcode.formatShortcode() ).toEqual( '[no_inner_content foo=\'bar\']burrito[/no_inner_content]' );
 	});
 
 });

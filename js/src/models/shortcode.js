@@ -71,15 +71,40 @@ Shortcode = Backbone.Model.extend({
 				return;
 			}
 
-			attrs.push( attr.get( 'attr' ) + '="' + attr.get( 'value' ) + '"' );
+			var attrValue = attr.get( 'value' );
+			/*
+			//attrValue = attrValue.replace('[', '&#91;');
+			//attrValue = attrValue.replace(']', '&#93;');
+			attrValue = attrValue.replace(/"/g, '&#34;');
+			console.log(attrValue);
+			*/
 
-		} );
+			//Single quote is less common: https://core.trac.wordpress.org/ticket/15434
+			attrs.push( attr.get( 'attr' ) + '=\'' + attrValue + '\'' );
+		});
 
 		if ( this.get( 'inner_content' ) ) {
 			content = this.get( 'inner_content' ).get( 'value' );
 		} else if ( this.get( 'inner_content_backup' ) ) {
 			content = this.get( 'inner_content_backup' );
 		}
+
+		//Replace shortcodes in inner_content with escaped versions of themselves.
+		/*
+		if(content) {
+			content = content.replace(/\[(.*?)\]/g, '[[$1]]');
+		}
+		*/
+
+		//http://wordpress.stackexchange.com/questions/33960/how-do-i-escape-a-in-a-short-code
+		/*
+		if(content) {
+			content = content.replace('[', '&#91;');
+			content = content.replace(']', '&#93;');
+			console.log("replacing");
+		  console.log(content);
+		}
+		*/
 
 		if ( attrs.length > 0 ) {
 			template = "[{{ shortcode }} {{ attributes }}]";
