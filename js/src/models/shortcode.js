@@ -89,7 +89,7 @@ Shortcode = Backbone.Model.extend({
 		});
 
 		$.each( this.get( 'attributes_backup' ), function( key, value){
-			attrs.push( key + '="' + value + '"' );
+			attrs.push( key + '=\'' + value + '\'' );
 		});
 
 		if ( this.get( 'inner_content' ) ) {

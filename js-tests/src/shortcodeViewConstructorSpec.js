@@ -38,9 +38,9 @@ describe( 'Shortcode View Constructor', function(){
 			]
 		};
 		sui.shortcodes.add( data );
-		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_custom_attribute foo="bar" bar="banana"]' );
+		var shortcode = ShortcodeViewConstructor.parseShortcodeString( '[no_custom_attribute foo=\'bar\' bar=\'banana\']' );
 		var _shortcode = $.extend( true, {}, shortcode );
-		expect( _shortcode.formatShortcode() ).toEqual( '[no_custom_attribute foo="bar" bar="banana"]' );
+		expect( _shortcode.formatShortcode() ).toEqual( '[no_custom_attribute foo=\'bar\' bar=\'banana\']' );
 	});
 
 });
