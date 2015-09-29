@@ -495,7 +495,7 @@ Shortcode = Backbone.Model.extend({
 			attrValue = attrValue.replace(/'/g, '');
 
 			//attrValue = attrValue.replace(/"/g, '&#34;');
-			console.log(attrValue);
+			//console.log(attrValue);
 
 
 			//Single quote is less common: https://core.trac.wordpress.org/ticket/15434
