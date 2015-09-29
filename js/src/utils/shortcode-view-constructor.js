@@ -152,7 +152,8 @@ var shortcodeViewConstructor = {
 
 		currentShortcode = defaultShortcode.clone();
 
-		//If we have attributes
+
+		var attributes_backup = {};
 		if ( matches[3] ) {
 
 			//Do attribute matching. From WP 4.3
@@ -178,14 +179,18 @@ var shortcodeViewConstructor = {
 
 					// If attribute found - set value.
 					// Trim quotes from beginning and end.
+					attrValue = bits[2].replace( /^"|^'|"$|'$/gmi, "" );
 					if ( attr ) {
-						attr.set( 'value', bits[2].replace( /^"|^'|"$|'$/gmi, "" ) );
+						attr.set( 'value', attrValue );
+					} else {
+						attributes_backup[ bits[1] ] = attrValue;
 					}
 
 				}
 			}
 
 		}
+		currentShortcode.set( 'attributes_backup', attributes_backup );
 
 		if ( matches[5] ) {
 			var inner_content = currentShortcode.get( 'inner_content' );
