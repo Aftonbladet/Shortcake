@@ -510,9 +510,11 @@ Shortcode = Backbone.Model.extend({
 			var attrValue = attr.get( 'value' );
 
 			//Replace attributes that we can't keep.
-			attrValue = attrValue.replace(/\[/g, '_');
-			attrValue = attrValue.replace(/\]/g, '_');
-			attrValue = attrValue.replace(/'/g, '');
+			if($.type(attrValue) === "string") {
+				attrValue = attrValue.replace(/\[/g, '_');
+				attrValue = attrValue.replace(/\]/g, '_');
+				attrValue = attrValue.replace(/'/g, '');
+			}
 
 			//attrValue = attrValue.replace(/"/g, '&#34;');
 			//console.log(attrValue);
