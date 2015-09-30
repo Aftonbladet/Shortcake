@@ -20,19 +20,7 @@ var EditShortcodeForm = wp.Backbone.View.extend({
 
 		var t = this;
 
-		var innerContent = this.model.get( 'inner_content' );
-		if ( innerContent && typeof innerContent.attributes.type !== 'undefined' ) {
-
-			// add UI for inner_content
-			var view = new editAttributeField( { model: innerContent } );
-
-			view.shortcode = t.model;
-			view.template  = wp.media.template( 'shortcode-ui-content' );
-
-			t.views.add( '.edit-shortcode-form-fields', view );
-
-		}
-
+		//Shortcode attributes
 		this.model.get( 'attrs' ).each( function( attr ) {
 
 			// Get the field settings from localization data.
@@ -59,6 +47,20 @@ var EditShortcodeForm = wp.Backbone.View.extend({
 			t.views.add( '.edit-shortcode-form-fields', view );
 
 		} );
+
+		//Inner content form
+		var innerContent = this.model.get( 'inner_content' );
+		if ( innerContent && typeof innerContent.attributes.type !== 'undefined' ) {
+
+			// add UI for inner_content
+			var view = new editAttributeField( { model: innerContent } );
+
+			view.shortcode = t.model;
+			view.template  = wp.media.template( 'shortcode-ui-content' );
+
+			t.views.add( '.edit-shortcode-form-fields', view );
+
+		}
 
 		if ( 0 === this.model.get( 'attrs' ).length && ( ! innerContent || typeof innerContent == 'undefined' ) ) {
 			var messageView = new Backbone.View({
