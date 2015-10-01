@@ -62,6 +62,7 @@ var EditShortcodeForm = wp.Backbone.View.extend({
 
 		}
 
+		//No attributes message
 		if ( 0 === this.model.get( 'attrs' ).length && ( ! innerContent || typeof innerContent == 'undefined' ) ) {
 			var messageView = new Backbone.View({
 				tagName:      'div',
