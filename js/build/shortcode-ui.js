@@ -217,7 +217,6 @@ Shortcode = Backbone.Model.extend({
 			//attrValue = attrValue.replace(/"/g, '&#34;');
 			//console.log(attrValue);
 
-
 			//Single quote is less common: https://core.trac.wordpress.org/ticket/15434
 			attrs.push( attr.get( 'attr' ) + '=\'' + attrValue + '\'' );
 		});
@@ -230,6 +229,11 @@ Shortcode = Backbone.Model.extend({
 			content = this.get( 'inner_content' ).get( 'value' );
 		} else if ( this.get( 'inner_content_backup' ) ) {
 			content = this.get( 'inner_content_backup' );
+		}
+
+		//Run autop before shooting into view
+		if(content) {
+			content = window.wp.editor.autop( content );
 		}
 
 		//Replace shortcodes in inner_content with escaped versions of themselves.
