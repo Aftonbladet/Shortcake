@@ -545,11 +545,9 @@ var shortcodeViewConstructor = {
 
 		var model, attr;
 
-		//Prepare tags
 		var shortcode_tags = _.map( sui.shortcodes.pluck( 'shortcode_tag' ), this.pregQuote ).join( '|' );
-		var re = this.getRegex(shortcode_tags), matches;
-
-		matches = re.exec( shortcodeString );
+		var regexp = wp.shortcode.regexp( shortcode_tags );
+		var matches = regexp.exec( shortcodeString );
 
 		if ( ! matches ) {
 			return;
@@ -567,41 +565,21 @@ var shortcodeViewConstructor = {
 
 
 		var attributes_backup = {};
-		if ( matches[3] ) {
 
-			//Do attribute matching. From WP 4.3
-			var attributeRegex = /(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/g; //mi
-			attributeMatches   = matches[3].match( attributeRegex ) || [];
-
-			// Trim whitespace from matches.
-			attributeMatches = attributeMatches.map( function( match ) {
-				return match.replace( /^\s+|\s+$/g, '' );
-			} );
-
-			// convert attribute strings to object.
-			for ( var i = 0; i < attributeMatches.length; i++ ) {
-
-				var bitsRegEx = /(\S+?)=(.*)/g;
-				var bits = bitsRegEx.exec( attributeMatches[i] );
-
-				if ( bits && bits[1] ) {
-
-					attr = currentShortcode.get( 'attrs' ).findWhere({
-						attr : bits[1]
-					});
-
-					// If attribute found - set value.
-					// Trim quotes from beginning and end.
-					attrValue = bits[2].replace( /^"|^'|"$|'$/gmi, "" );
-					if ( attr ) {
-						attr.set( 'value', attrValue );
-					} else {
-						attributes_backup[ bits[1] ] = attrValue;
-					}
-
-				}
+		var attributes = wp.shortcode.attrs( matches[3] );
+		for ( var key in attributes.named ) {
+			if ( ! attributes.named.hasOwnProperty( key ) ) {
+				continue;
 			}
-
+			value = attributes.named[ key ];
+			attr = currentShortcode.get( 'attrs' ).findWhere({
+				attr : key
+			});
+			if ( attr ) {
+				attr.set( 'value', value );
+			} else {
+				attributes_backup[ key ] = value;
+			}
 		}
 		currentShortcode.set( 'attributes_backup', attributes_backup );
 
@@ -628,6 +606,27 @@ var shortcodeViewConstructor = {
 
 		return content;
 
+	},
+
+	/**
+	 * JS version of PHP's preg_quote()
+	 */
+	pregQuote: function( str, delimiter ) {
+		//  discuss at: http://phpjs.org/functions/preg_quote/
+		// original by: booeyOH
+		// improved by: Ates Goral (http://magnetiq.com)
+		// improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+		// improved by: Brett Zamir (http://brett-zamir.me)
+		// bugfixed by: Onno Marsman
+		//   example 1: preg_quote("$40");
+		//   returns 1: '\\$40'
+		//   example 2: preg_quote("*RRRING* Hello?");
+		//   returns 2: '\\*RRRING\\* Hello\\?'
+		//   example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
+		//   returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'
+
+		return String(str)
+		.replace( new RegExp( '[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + ( delimiter || '' ) + '-]', 'g' ), '\\$&' );
 	},
 
 	// Backwards compatability for Pre WP 4.2.
@@ -752,27 +751,6 @@ var shortcodeViewConstructor = {
 
 		//From WP 4.3
 		return new RegExp( '\\[(\\[?)(' + shortcode_tags + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
-	},
-
-	/**
-	 * JS version of PHP's preg_quote()
-	 */
-	pregQuote: function( str, delimiter ) {
-		//  discuss at: http://phpjs.org/functions/preg_quote/
-		// original by: booeyOH
-		// improved by: Ates Goral (http://magnetiq.com)
-		// improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// improved by: Brett Zamir (http://brett-zamir.me)
-		// bugfixed by: Onno Marsman
-		//   example 1: preg_quote("$40");
-		//   returns 1: '\\$40'
-		//   example 2: preg_quote("*RRRING* Hello?");
-		//   returns 2: '\\*RRRING\\* Hello\\?'
-		//   example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
-		//   returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'
-
-		return String(str)
-		.replace( new RegExp( '[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + ( delimiter || '' ) + '-]', 'g' ), '\\$&' );
 	},
 
 };
