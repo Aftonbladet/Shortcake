@@ -78,7 +78,14 @@ Shortcode = Backbone.Model.extend({
 				attr.set( 'value', encodeURIComponent( decodeURIComponent( attr.get( 'value' ) ) ), { silent: true } );
 			}
 
-			attrs.push( attr.get( 'attr' ) + '="' + attr.get( 'value' ) + '"' );
+			//Replace characters that we can't keep.
+			if($.type(attr.get( 'value' )) === "string") {
+				attr.set( 'value', attr.get('value').replace(/\[/g, '_') );
+				attr.set( 'value', attr.get('value').replace(/\]/g, '_') );
+				attr.set( 'value', attr.get('value').replace(/\'/g, '&rsquo;') );
+			}
+
+			attrs.push( attr.get( 'attr' ) + '=\'' + attr.get( 'value' ) + '\'' );
 
 		} );
 
@@ -91,6 +98,13 @@ Shortcode = Backbone.Model.extend({
 		} else if ( this.get( 'inner_content_backup' ) ) {
 			content = this.get( 'inner_content_backup' );
 		}
+
+		//Run autop before shooting into view
+		/*
+		if(content) {
+			content = window.wp.editor.autop( content );
+		}
+		*/
 
 		if ( attrs.length > 0 ) {
 			template = "[{{ shortcode }} {{ attributes }}]";
